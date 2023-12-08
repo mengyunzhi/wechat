@@ -1,0 +1,8 @@
+com/mengyunzhi/wechat/vo/MessageTemplateRequest.class
+com/mengyunzhi/wechat/WechatProxy.class
+com/mengyunzhi/wechat/exception/QrCodeCanNotGetException.class
+com/mengyunzhi/wechat/exception/HttpRequestException.class
+com/mengyunzhi/wechat/vo/TextResponse.class
+com/mengyunzhi/wechat/vo/MessageTemplateRequest$MiniProgram.class
+com/mengyunzhi/wechat/vo/ScanQrCodeLanding.class
+com/mengyunzhi/wechat/vo/MessageTemplateRequest$DataEntry.class
