@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"com.mengyunzhi.wechat"},{"l":"com.mengyunzhi.wechat.exception"},{"l":"com.mengyunzhi.wechat.vo"}]
