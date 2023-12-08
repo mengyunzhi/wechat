@@ -25,8 +25,14 @@ public class WechatProxy {
      */
     private String instanceName;
 
+    /**
+     * 微服务客户端
+     */
     private DiscoveryClient discoveryClient;
 
+    /**
+     * 服务实例（该实例实际上在和微信服务器对接）
+     */
     private String serviceInstance;
     /**
      * 微信appId
