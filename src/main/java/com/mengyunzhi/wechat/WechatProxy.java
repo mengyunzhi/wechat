@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mengyunzhi.wechat.exception.HttpRequestException;
 import com.mengyunzhi.wechat.exception.QrCodeCanNotGetException;
 import com.mengyunzhi.wechat.vo.MessageTemplateRequest;
+import org.springframework.cloud.client.ServiceInstance;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -20,49 +23,43 @@ public class WechatProxy {
     /**
      * 应用名称（在微服务注册时，应该唯一)
      */
-    private String appName;
+    private String instanceName;
 
-    private String host;
+    private DiscoveryClient discoveryClient;
 
-    private int port;
-
+    private String serviceInstance;
     /**
      * 微信appId
      */
     private String appId;
 
     /**
-     * 默认的二维码生效时间为1分钟
-     */
-    private int expireSeconds;
-
-    /**
      * 默认回调路径为空
      */
-    private String defaultCallbackPath;
+    private final String defaultCallbackPath = "";
 
-    private String baseUri;
+    private final int defaultTempQrCodeExpireSeconds = 10 * 60;
 
-    public WechatProxy(String appName, String appId, String host, int port) {
-        new WechatProxy(appName, appId, host, port, 10 * 60, "", "/request");
+    private String requestBaseUri;
+
+    public WechatProxy(DiscoveryClient discoveryClient, String serviceInstance, String instanceName, String appId) {
+        this(discoveryClient, serviceInstance, instanceName, appId, "/request");
     }
 
-    public WechatProxy(String appName, String appId, String host, int port, int expireSeconds, String defaultCallbackPath, String baseUri) {
-        this.appName = appName;
+    public WechatProxy(DiscoveryClient discoveryClient, String serviceInstance, String instanceName, String appId, String requestBaseUri) {
+        this.discoveryClient = discoveryClient;
+        this.serviceInstance = serviceInstance;
+        this.instanceName = instanceName;
         this.appId = appId;
-        this.host = host;
-        this.port = port;
-        this.expireSeconds = expireSeconds;
-        this.defaultCallbackPath = defaultCallbackPath;
-        this.baseUri = baseUri.startsWith("/") ? baseUri : "/" + baseUri;
+        this.requestBaseUri = requestBaseUri.startsWith("/") ? requestBaseUri : "/" + requestBaseUri;
     }
 
     public String getTmpQrCode(String sceneStr) {
-        return this.getTmpQrCode(sceneStr, defaultCallbackPath, expireSeconds);
+        return this.getTmpQrCode(sceneStr, defaultCallbackPath, defaultTempQrCodeExpireSeconds);
     }
 
     public String getTmpQrCode(String sceneStr, String callbackPath) {
-        return this.getTmpQrCode(sceneStr, callbackPath, expireSeconds);
+        return this.getTmpQrCode(sceneStr, callbackPath, defaultTempQrCodeExpireSeconds);
     }
 
     public String getTmpQrCode(String sceneStr, int expireSeconds) {
@@ -79,7 +76,7 @@ public class WechatProxy {
         try {
             // Build the request URL
             String requestUrl = getRequestUrl("/getTmpQrCode");
-            fullUrl = requestUrl + "?instance=" + encodeParams(appName)
+            fullUrl = requestUrl + "?instance=" + encodeParams(instanceName)
                 + "&appId=" + appId;
 
             // Create a URL object
@@ -107,13 +104,16 @@ public class WechatProxy {
             int responseCode = connection.getResponseCode();
 
             // Read the response
-            if (200 <= responseCode &&  responseCode < 300) {
+            if (200 <= responseCode && responseCode < 300) {
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
                     return reader.lines().collect(Collectors.joining("\n"));
                 }
             } else {
-                String message = "HTTP Request Failed with error code: " + responseCode;
-                System.out.println(message);
+                String body;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+                    body = reader.lines().collect(Collectors.joining("\n"));
+                }
+                String message = "code: " + responseCode + "。body: " + body;
                 throw new HttpRequestException(message);
             }
         } catch (IOException e) {
@@ -135,9 +135,9 @@ public class WechatProxy {
         String fullUrl = "";
         try {
             // Build the request URL
-            String requestUrl = "http://" + host + ":" + port + "/request/getTmpQrCode";
+            String requestUrl = this.getRequestUrl("/getTmpQrCode");
             fullUrl = requestUrl + "?scene=" + encodeParams(sceneStr)
-                + "&instance=" + encodeParams(appName)
+                + "&instance=" + encodeParams(instanceName)
                 + "&appId=" + appId
                 + "&callbackPath=" + encodeParams(callbackPath)
                 + "&expireSeconds=" + expireSeconds;
@@ -160,8 +160,11 @@ public class WechatProxy {
                     return reader.lines().collect(Collectors.joining("\n"));
                 }
             } else {
-                String message = "HTTP Request Failed with error code: " + responseCode;
-                System.out.println(message);
+                String body;
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getErrorStream()))) {
+                    body = reader.lines().collect(Collectors.joining("\n"));
+                }
+                String message = "code: " + responseCode + "。body: " + body;
                 throw new HttpRequestException(message);
             }
         } catch (IOException e) {
@@ -181,6 +184,12 @@ public class WechatProxy {
     }
 
     private String getRequestUrl(String uri) {
-        return "http://" + host + ":" + port + this.baseUri + (uri.startsWith("/") ? uri : "/" + uri);
+        List<ServiceInstance> wechatLandingServices = discoveryClient.getInstances(serviceInstance);
+        if (wechatLandingServices.size() == 0) {
+            String message = "未在注册中心找到服务：" + serviceInstance;
+            throw new RuntimeException(message);
+        }
+        ServiceInstance wechatLandingService = wechatLandingServices.get(0);
+        return "http://" + wechatLandingService.getHost() + ":" + wechatLandingService.getPort() + this.requestBaseUri + (uri.startsWith("/") ? uri : "/" + uri);
     }
 }
