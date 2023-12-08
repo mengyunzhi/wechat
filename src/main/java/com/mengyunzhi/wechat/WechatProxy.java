@@ -48,6 +48,13 @@ public class WechatProxy {
 
     private String requestBaseUri;
 
+    /**
+     * 构造函数
+     * @param discoveryClient 微服务发现
+     * @param serviceInstance 与微信服务器对接的服务
+     * @param instanceName 当前实例名称
+     * @param appId appId
+     */
     public WechatProxy(DiscoveryClient discoveryClient, String serviceInstance, String instanceName, String appId) {
         this(discoveryClient, serviceInstance, instanceName, appId, "/request");
     }
