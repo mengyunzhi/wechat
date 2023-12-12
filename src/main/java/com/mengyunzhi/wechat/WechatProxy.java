@@ -88,7 +88,7 @@ public class WechatProxy {
         String fullUrl = "";
         try {
             // Build the request URL
-            String requestUrl = getRequestUrl("/getTmpQrCode");
+            String requestUrl = getRequestUrl("/sendTemplateMessage");
             fullUrl = requestUrl + "?instance=" + encodeParams(instanceName)
                 + "&appId=" + appId;
 

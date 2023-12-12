@@ -30,10 +30,27 @@ public class MessageTemplateRequest {
      */
     private String uuid;
 
+    public MessageTemplateRequest() {
+    }
+
+    public MessageTemplateRequest(String openid, String templateId, Map<String, String> data) {
+        this.openid = openid;
+        this.templateId = templateId;
+        this.data = data;
+    }
+
+    public MessageTemplateRequest(String openid, String templateId, String url, MiniProgram miniProgram, Map<String, String> data) {
+        this.openid = openid;
+        this.templateId = templateId;
+        this.url = url;
+        this.miniProgram = miniProgram;
+        this.data = data;
+    }
+
     /**
      * 模板数据
      */
-    private Map<String, DataEntry> data;
+    private Map<String, String> data;
 
     public String getOpenid() {
         return openid;
@@ -75,11 +92,11 @@ public class MessageTemplateRequest {
         this.uuid = uuid;
     }
 
-    public Map<String, DataEntry> getData() {
+    public Map<String, String> getData() {
         return data;
     }
 
-    public void setData(Map<String, DataEntry> data) {
+    public void setData(Map<String, String> data) {
         this.data = data;
     }
 
@@ -107,20 +124,6 @@ public class MessageTemplateRequest {
 
         public void setPagePath(String pagePath) {
             this.pagePath = pagePath;
-        }
-    }
-
-    public static class DataEntry {
-        private String value;
-
-        // Getter and Setter methods
-
-        public String getValue() {
-            return value;
-        }
-
-        public void setValue(String value) {
-            this.value = value;
         }
     }
 }
