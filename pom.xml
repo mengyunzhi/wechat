@@ -6,7 +6,7 @@
 
     <groupId>com.mengyunzhi</groupId>
     <artifactId>wechat</artifactId>
-    <version>2023.12.08-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <url>https://github.com/mengyunzhi/wechat</url>
@@ -27,7 +27,6 @@
             <timezone>+8</timezone>
         </developer>
     </developers>
-
     <scm>
         <connection>scm:git:https://github.com/mengyunzhi/wechat.git</connection>
         <developerConnection>scm:git:https://github.com/mengyunzhi/wechat.git</developerConnection>
@@ -77,60 +76,61 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>1.8</java.version>
+        <gpg.keyname>F28358C2AAA021B831BAD7B559C086C400FC8E2E</gpg.keyname>
     </properties>
 
-    <!--    <build>-->
-    <!--        <plugins>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-source-plugin</artifactId>-->
-    <!--                <version>3.0.1</version>-->
-    <!--                <executions>-->
-    <!--                    <execution>-->
-    <!--                        <id>attach-sources</id>-->
-    <!--                        <goals>-->
-    <!--                            <goal>jar-no-fork</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                </executions>-->
-    <!--            </plugin>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-javadoc-plugin</artifactId>-->
-    <!--                <version>2.9.1</version>-->
-    <!--                <executions>-->
-    <!--                    <execution>-->
-    <!--                        <id>attach-javadocs</id>-->
-    <!--                        <goals>-->
-    <!--                            <goal>jar</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                </executions>-->
-    <!--            </plugin>-->
-    <!--            &lt;!&ndash;推送到maven官方仓库时，需要启用以下注释内容，以保证生成签名&ndash;&gt;-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-gpg-plugin</artifactId>-->
-    <!--                <version>1.5</version>-->
-    <!--                <executions>-->
-    <!--                    <execution>-->
-    <!--                        <id>sign-artifacts</id>-->
-    <!--                        <phase>verify</phase>-->
-    <!--                        <goals>-->
-    <!--                            <goal>sign</goal>-->
-    <!--                        </goals>-->
-    <!--                    </execution>-->
-    <!--                </executions>-->
-    <!--            </plugin>-->
-    <!--            <plugin>-->
-    <!--                <groupId>org.apache.maven.plugins</groupId>-->
-    <!--                <artifactId>maven-compiler-plugin</artifactId>-->
-    <!--                <version>3.8.0</version>-->
-    <!--                <configuration>-->
-    <!--                    <source>1.8</source>-->
-    <!--                    <target>1.8</target>-->
-    <!--                </configuration>-->
-    <!--            </plugin>-->
-    <!--        </plugins>-->
-    <!--    </build>-->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>2.9.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--推送到maven官方仓库时，需要启用以下注释内容，以保证生成签名-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.5</version>
+                <executions>
+                    <execution>
+                        <id>sign-artifacts</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>sign</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
