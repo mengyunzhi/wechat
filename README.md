@@ -50,6 +50,24 @@ public class WechatLandingController {
 
 当前接收的请求仅支持扫描事件 `ScanQrCodeLanding`，在响应时仅支持文本响应 `TextResponse`。当有扫码事件时，会将携带有扫码场景值、openid及appid的信息请求到当前method上。
 
+
+### 权限
+由于当前微服务间的请求并没有携带认证信息，所以需要在Spring Security中设置权限，宽松的权限设置为:
+
+
+```java
+.antMatchers("/wechatLanding/**").permitAll()
+```
+
+更严谨的权限应该设置为：
+
+```java
+.antMatchers("/wechatLanding/**").hasIpAddress("192.168.1.17")
+```
+
+在团队的测试环境下, CD 服务器的请求 IP 为 `192.168.1.17`，生产服务器的 IP 为`192.168.100.1`。所以也可以使用`.antMatchers("/wechatLanding/**").hasIpAddress("192.168.0.0/16")`来同时满足生产与测试环境。
+
+
 ### 实例化
 
 当前并没有开发适用于spring boot的starter，所以需要手动的进行实例化。
