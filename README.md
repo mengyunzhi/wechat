@@ -36,6 +36,23 @@
 
 `ScanQrCodeLanding`中包括：`scene`, `appid`以及`openid`.
 
+### 处理回调示例
+```java
+    @PostMapping("qrCodeScanLanding")
+    void qrCodeScanLanding(@RequestBody ScanQrCodeLanding request) {
+    }
+```
+此时用户端收到的信息为：`操作成功`
+
+```java
+    @PostMapping("qrCodeScanLanding")
+    TextResponse qrCodeScanLanding(@RequestBody ScanQrCodeLanding request) {
+        return new TextResponse("自定义文字提醒");
+    }
+```
+此时用户端收到的信息为：`自定义文字提醒`
+
+其它类型的返回尚不支持。
 
 ### 发送模板消息
 
