@@ -1,82 +1,41 @@
 # 微信统一代理
 
-解决多个应用共用一个微信公众号的问题。
+主要解决多个应用共用一个微信公众号的问题，当前主要完成基于scene生成二维码，以及用户扫描二维码的回调问题。
 
-## 配置方法
+## 使用方法
 
-> 以开发环境为例
+首先添加依赖
 
-
-### 添加依赖
-
-根据项目的spring boot信息，添加对应的 spring cloud .
-
-### 配置eureka
-
-```yaml
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://admin:yunzhi@wechat-api-proxy.mengyunzhi.com:17085/eureka/  #注册到 eureka 微信着陆
-    enabled: true # 启用
-  instance: # 当前实例信息
-    preferIpAddress: false         # 设置为false时，其它的微服务在连接本例时将使用下面配置的hostname，否则将使用本例暴露给服务发现的 IP 地址
-    hostname: 192.168.20.243       # 当preferIpAddress为false时生效，表现本例在其它微服务处暴露的地址，注意不要以http或https打头
-    non-secure-port: 8081          # 本例暴露给其它微服务的端口号
-    homePageUrl: /wechatLanding    # 其它微服务与本例交互的入口(以/开头)，当有扫描事件时使用此地址接收请求
-
+```xml
+        <dependency>
+            <groupId>com.mengyunzhi</groupId>
+            <artifactId>wechat</artifactId>
+            <version>1.1.0</version>
+        </dependency>
 ```
-
-如果本例与服务发现端处于可以根据 IP 地址进行互相访问，则可以将 preferIpAddress 设置为 true，同时也可以不设置端口号。相反，服务发现端不能直接访问本例（比如本例在开发机的局域网机构上，而服务发现端位于公网上），则需要设置 hostname non-secure-port为本例反向代理的地址（比如使用frps穿透出去的地址和端口号）
-
-### C层
-
-示例如下，注意 `RequestMapping` 中的 `wechatLanding` 与前面配置的相同，
-
-```java
-import com.mengyunzhi.wechat.vo.ScanQrCodeLanding;
-import com.mengyunzhi.wechat.vo.TextResponse;
-
-@RestController
-@RequestMapping("wechatLanding")
-public class WechatLandingController {
-    // 请求方法为POST
-    @PostMapping
-    public TextResponse scanQrCode(@RequestBody ScanQrCodeLanding landingRequest) {
-        // 根据情况进行相应的处理
-    }
-}
-```
-
-当前接收的请求仅支持扫描事件 `ScanQrCodeLanding`，在响应时仅支持文本响应 `TextResponse`。当有扫码事件时，会将携带有扫码场景值、openid及appid的信息请求到当前method上。
-
-### 实例化
-
-当前并没有开发适用于spring boot的starter，所以需要手动的进行实例化。
-
-```java
-    WxMpConfig wxMpConfig) {
-WechatProxy wechatProxy = new WechatProxy(discoveryClient,
-    "WECHAT-SERVICE",
-    "SWITCHGEARV2",
-    "your-wechat-mp-app-id");
-```
-
-其中 ：
-
-* `discoveryClient` 为  `DiscoveryClient` 实例
-* `"WECHAT-SERVICE"`为微信着陆微服务的名称，在团队中统一为`"WECHAT-SERVICE"`
-* `"SWITCHGEARV2"`为本例的名称，唯一
-* `"your-wechat-mp-app-id"` 为微信公众号的 appid
 
 ### 请求临时二维码
 
 ```java
-String sceneStr = UUID.randomUUID();
-String qrUrl = wechatProxy.getTmpQrCode(sceneStr);
+        // 团队微信代理服务器请求地址及请求前缀
+        String wechatProxyRequestUri = "http://localhost:8081/request";
+        // 用户扫码后的回调地址
+        String callbackHost = "http://localhost:8080/wechat";
+        String instanceName = "当前服务实例名称";
+        // 对应的微信公众号appid，需要在团队微信代码服务器中进行配置
+        String appid = "wx53bf06122618f768";
+        // 用户扫码后，微信服务器回调的场景值，每个图片应该唯一
+        String scene = "1234";
+        WechatProxy wechatProxy = new WechatProxy(wechatProxyRequestUri, callbackHost, instanceName, appid);
+        String imageUrl = wechatProxy.getTmpQrCode(scene, 6000);
+        //        String imageUrl = wechatProxy.getTmpQrCode(scene, "callbackPath", 6000);
+        System.out.println("微信扫码图片地址为：" + imageUrl);
 ```
 
-此时 `qrUrl` 即为二维码图片的地址。当用户扫描这张二维时，则将携带此时的`sceneStr`来请求 `WechatLandingController->scanQrCode`。
+此时用户扫码后，会将携带 `ScanQrCodeLanding` 的信息以POST的方式请求到 `callbackHost + callbackPath` 上，其中 `callbackPath` 为选填项，默认值为 `""`。
+
+`ScanQrCodeLanding`中包括：`scene`, `appid`以及`openid`.
+
 
 ### 发送模板消息
 
