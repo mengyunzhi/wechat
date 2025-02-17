@@ -6,7 +6,7 @@
 
     <groupId>com.mengyunzhi</groupId>
     <artifactId>wechat</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <url>https://github.com/mengyunzhi/wechat</url>
@@ -82,7 +82,7 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <java.version>1.8</java.version>
-        <gpg.keyname>F28358C2AAA021B831BAD7B559C086C400FC8E2E</gpg.keyname>
+        <gpg.keyname>C3F4C6463E2F322D09067A5D3324F1C8614FBFFB</gpg.keyname>
     </properties>
 
     <build>

@@ -10,7 +10,7 @@
         <dependency>
             <groupId>com.mengyunzhi</groupId>
             <artifactId>wechat</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.1</version>
         </dependency>
 ```
 
@@ -201,11 +201,15 @@ sequenceDiagram
     </properties>
 ```
 
+注意，gpg需要推送到公网上，参考：https://segmentfault.com/a/1190000044517601 ，推送到任一公钥服务器即可。
+
 ## 发布
 
 ```bash
 $ mvn clean deploy
 ```
+
+首先启用代理的全局模式，并使用原生的代理（团队转的会发生网络问题），然后在控制台中加入代理的代码。
 
 如果我们想使用一些变量来触发，则可以加入 -P 参数，比如：`mvn clean deploy -P release`，此时将会按 `release` 来自动设置一些变量（我们当前还没有用到）
 
@@ -227,11 +231,11 @@ $ mvn clean deploy
 
 ### 发送审核
 
-如果是正式的库，则需要通过maven官方的一些审核，包括注释格式是否正确等。首先登录 https://oss.sonatype.org/ , 找到左侧的：Staging Repositories ，点击刷新 。然后我们刚刚推上来的jar包便会有一条记录。
+如果是正式的库，则需要通过maven官方的一些审核，包括注释格式是否正确等。首先登录 https://oss.sonatype.org/ , 找到左侧的：Staging Repositories ，点击刷新 。然后我们刚刚推上来的jar包便会有一条(如果产生了多条，说明网络有问题)记录，这条记录的content选项卡中显示了当前提交的文件，正确的文件内容参考：https://repo.maven.apache.org/maven2/com/mengyunzhi/wechat/1.0.0/。
 
-选择该记录，然后选择标签卡上的 close。此时将进行待发布流程。稍等一会，再次点击该记录，下方的Activity显示successful后，便可以进行release了。点击该记录，点击release。此时将自动进行release环节。
+选择这条记录，然后选择标签卡上的 close。此时将进行待发布流程。稍等一会，再次点击该记录，下方的Activity会显示整个进度，如果所有的规则都通过，则显示successful。此后，便可以进行release了。点击该记录，点击release。此时将自动进行release环节。
 
 此时如果没有问题，则会发布成功，可以在左侧的搜索中搜索相应的关键字来查看该jar是否发布成功。如果未发布成功，则可以在 Staging Repositories 仍然发现该条记录，点击记录也会出错错语的原因。
 
-如果发布成功，稍等等待一会(这个时间不会太短，需要有一定的耐心)，则可以在 https://central.sonatype.com/ 官方中央仓库中找到该package。同时阿里云及其它仓库（比如：https://mvnrepository.com/ ） 的同步同需要一时间，需要有一定的耐心。
+如果发布成功，稍等待一会(这个时间不会太短，需要有一定的耐心)，则可以在 https://repo.maven.apache.org/maven2/  https://central.sonatype.com/ 官方中央仓库中找到该package。同时阿里云及其它仓库（比如：https://mvnrepository.com/ ） 的同步同需要一时间，需要有一定的耐心。
 
