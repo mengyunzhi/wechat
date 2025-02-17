@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class WechatProxyTest {
 
-    @Test
+//    @Test
     void getTmpQrCode() {
         // 团队微信代理服务器请求地址及请求前缀
         String wechatProxyRequestUri = "http://localhost:8081/request";

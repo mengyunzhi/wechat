@@ -45,4 +45,14 @@ public class ScanQrCodeLanding {
     public void setAppId(String appId) {
         this.appId = appId;
     }
+
+
+    @Override
+    public String toString() {
+        return "ScanQrCodeLanding{" +
+                "openid='" + openid + '\'' +
+                ", scene='" + scene + '\'' +
+                ", appId='" + appId + '\'' +
+                '}';
+    }
 }

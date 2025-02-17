@@ -48,14 +48,14 @@ public class WechatProxy {
      * 构造函数
      *
      * @param requestUri   请求资源地址
-     * @param callbackHost 回调主机
+     * @param callbackUri  回调地址（当前主机地址+微信扫码后回调的路由）
      * @param instanceName 实例名称
-     * @param appId        当前实例名称
+     * @param appId        微信公众号appId
      */
-    public WechatProxy(String requestUri, String callbackHost, String instanceName, String appId) {
+    public WechatProxy(String requestUri, String callbackUri, String instanceName, String appId) {
         this.instanceName = instanceName;
         this.appId = appId;
-        this.callbackHost = callbackHost;
+        this.callbackHost = callbackUri;
 
         this.requestUri = requestUri.toLowerCase().startsWith("http") ? requestUri : "http://" + requestUri;
         if (this.requestUri.endsWith("/")) {
